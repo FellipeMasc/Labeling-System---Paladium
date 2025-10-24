@@ -38,7 +38,6 @@ export async function middleware(request: NextRequest) {
         cookie: request.headers.get("cookie") || "",
       },
     });
-    console.log(adminRes);
     if (adminRes.status !== 200) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -46,6 +45,18 @@ export async function middleware(request: NextRequest) {
 
   if (isPrivateRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isLoginRoute && isAuthenticated) {
+    const adminRes = await fetch(`http://${request.nextUrl.host}/api/auth/verify-admin`, {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+    });
+    if (adminRes.status === 200) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
