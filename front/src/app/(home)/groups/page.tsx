@@ -1,10 +1,11 @@
 "use client";
 import { getUserGroups } from "@/actions/group_actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Image as ImageIcon, FolderOpen } from "lucide-react";
+import { Users, Image as ImageIcon, FolderOpen, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type Group = {
   id: string;
@@ -95,6 +96,11 @@ export default function UserGroupsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">My Groups</h1>
           <p className="text-muted-foreground">Groups you've been assigned to for image labeling</p>
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="cursor-pointer mb-2">
+              <ArrowLeft className="h-4 w-4 mr-1" /> Back to Home
+            </Button>
+          </Link>
         </div>
 
         {groups.length === 0 ? (

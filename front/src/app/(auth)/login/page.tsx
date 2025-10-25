@@ -22,7 +22,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md px-4">
         <div className="mb-2 text-center animate-fade-in-down">
           <h1 className="text-3xl font-medium text-[var(--color-text-default)] mb-2">
-            Bem vindo ao Paladium AI Labelling System
+            Welcome to Paladium AI Labelling System
           </h1>
         </div>
         <div className="rounded-lg shadow-lg border border-[hsl(var(--positive-stroke))] bg-foreground overflow-hidden">
@@ -36,7 +36,7 @@ export default function LoginPage() {
                   "data-[state=active]:bg-primary data-[state=active]:text-[var(--color-text-subtle)] data-[state=active]:shadow-md"
                 )}
               >
-                <span className="relative z-10">Entrar</span>
+                <span className="relative z-10">Login</span>
                 <span className="absolute inset-0 bg-gradient-to-tr from-[hsla(var(--btn-primary)/0.8)] to-[hsla(var(--btn-primary)/0.6)] opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               </TabsTrigger>
               <TabsTrigger
@@ -47,7 +47,7 @@ export default function LoginPage() {
                   "data-[state=active]:bg-primary data-[state=active]:text-[var(--color-text-subtle)] data-[state=active]:shadow-md"
                 )}
               >
-                <span className="relative z-10">Cadastrar</span>
+                <span className="relative z-10">Register</span>
                 <span className="absolute inset-0 bg-gradient-to-tr from-primary to-primary-hover opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               </TabsTrigger>
             </TabsList>
