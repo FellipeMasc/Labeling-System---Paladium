@@ -34,6 +34,7 @@ export default function AssignUserSection({ groupId, currentMembers }: { groupId
 
   const loadAvailableUsers = async () => {
     const result = await getAvailableLabelers();
+    console.log("result", result);
     if (result.success && result.users) {
       // Filter out users already in the group
       const memberIds = currentMembers.map((m) => m.userId);
@@ -107,7 +108,6 @@ export default function AssignUserSection({ groupId, currentMembers }: { groupId
         </Button>
       </div>
 
-      {/* Show current members with remove option */}
       {currentMembers.length > 0 && (
         <div className="space-y-2">
           {currentMembers.map((member) => (
@@ -115,13 +115,14 @@ export default function AssignUserSection({ groupId, currentMembers }: { groupId
               <div>
                 <p className="font-medium text-sm">{member.user.name}</p>
                 <p className="text-xs text-muted-foreground">{member.user.email}</p>
+                <p className="text-xs text-muted-foreground">{new Date(member.joinedAt).toLocaleDateString()}</p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleRemove(member.userId)}
                 disabled={removing === member.userId}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               >
                 {removing === member.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
               </Button>

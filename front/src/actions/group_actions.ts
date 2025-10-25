@@ -75,6 +75,21 @@ export async function getGroupById(groupId: string) {
           },
         },
         images: {
+          include: {
+            tags: {
+              include: {
+                createdBy: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+            },
+          },
           orderBy: {
             createdAt: "desc",
           },
@@ -177,5 +192,51 @@ export async function getAvailableLabelers() {
   } catch (error) {
     console.error("Error fetching labelers:", error);
     return { success: false, error: "Failed to fetch labelers" };
+  }
+}
+
+export async function getUserGroups(userId: string) {
+  try {
+    const groups = await prisma.group.findMany({
+      where: {
+        members: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            status: true,
+          },
+        },
+        _count: {
+          select: {
+            members: true,
+            images: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return { success: true, groups };
+  } catch (error) {
+    console.error("Error fetching user groups:", error);
+    return { success: false, error: "Failed to fetch user groups" };
   }
 }

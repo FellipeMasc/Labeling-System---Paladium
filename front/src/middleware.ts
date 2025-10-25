@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isLoginRoute && isAuthenticated) {
+  if (isAuthenticated && !isAdminRoute) {
     const adminRes = await fetch(`http://${request.nextUrl.host}/api/auth/verify-admin`, {
       headers: {
         cookie: request.headers.get("cookie") || "",
