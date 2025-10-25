@@ -55,8 +55,9 @@ export async function middleware(request: NextRequest) {
     });
     if (adminRes.status === 200) {
       return NextResponse.redirect(new URL("/admin", request.url));
+    } else {
+      return NextResponse.next();
     }
-    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

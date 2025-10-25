@@ -46,9 +46,9 @@ export default function SignUp() {
   return (
     <Card className="border-none shadow-none bg-background rounded-none">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-medium text-[var(--color-text-default)]">Cadastrar</CardTitle>
+        <CardTitle className="text-xl font-medium text-[var(--color-text-default)]">Register</CardTitle>
         <CardDescription className="text-[var(--color-text-subtle)]">
-          Digite suas informações para criar uma conta
+          Enter your information to create an account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -56,12 +56,12 @@ export default function SignUp() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first-name" className="text-[var(--color-text-default)] font-medium">
-                Nome de Usuário
+                Username
               </Label>
               <div className="relative">
                 <Input
                   id="first-name"
-                  placeholder="João"
+                  placeholder="Fellipe"
                   required
                   onChange={(e) => {
                     setFirstName(e.target.value);
@@ -76,7 +76,7 @@ export default function SignUp() {
 
           <div>
             <Label htmlFor="checkbox" className="text-[var(--color-text-default)] font-medium">
-              Sou admin
+              I am an admin
             </Label>
             <Input
               id="checkbox"
@@ -95,7 +95,7 @@ export default function SignUp() {
               <Input
                 id="email"
                 type="email"
-                placeholder="email@exemplo.com"
+                placeholder="email@example.com"
                 required
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -107,11 +107,11 @@ export default function SignUp() {
             </div>
           </div>
           {email.length > 0 && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) && (
-            <p className="text-red-500 text-sm">Email inválido</p>
+            <p className="text-red-500 text-sm">Invalid email</p>
           )}
           <div className="space-y-2">
             <Label htmlFor="password" className="text-[var(--color-text-default)] font-medium">
-              Senha
+              Password
             </Label>
             <div className="relative">
               <Input
@@ -120,27 +120,21 @@ export default function SignUp() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
-                placeholder="Senha"
+                placeholder="Password"
                 className="pl-10 bg-background border-secondary focus:border-primary focus:ring-primary transition-all duration-200"
               />
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-subtle)]" />
             </div>
           </div>
 
-          {/* <div className="space-y-2">
+          <div className="space-y-2">
             {password.length < 8 && password.length > 0 && (
-              <p className="text-red-500 text-sm">A senha deve ter pelo menos 8 caracteres</p>
+              <p className="text-red-500 text-sm">Password must be at least 8 characters</p>
             )}
-            {password.length > 0 && !/[A-Z]/.test(password) && (
-              <p className="text-red-500 text-sm">A senha deve ter pelo menos uma letra maiúscula</p>
-            )}
-            {password.length > 0 && !/[!@#$%^&*]/.test(password) && (
-              <p className="text-red-500 text-sm">A senha deve ter pelo menos um caracter especial</p>
-            )}
-          </div> */}
+          </div>
           <div className="space-y-2">
             <Label htmlFor="password_confirmation" className="text-[var(--color-text-default)] font-medium">
-              Confirmar Senha
+              Confirm Password
             </Label>
             <div className="relative">
               <Input
@@ -149,13 +143,13 @@ export default function SignUp() {
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 autoComplete="new-password"
-                placeholder="Confirmar Senha"
+                placeholder="Confirm Password"
                 className="pl-10 bg-background border-secondary focus:border-primary focus:ring-primary transition-all duration-200"
               />
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-subtle)]" />
             </div>
           </div>
-          {/* {password !== passwordConfirmation && <p className="text-red-500 text-sm">As senhas não coincidem</p>} */}
+          {password !== passwordConfirmation && <p className="text-red-500 text-sm">Passwords do not match</p>}
 
           <Button
             type="submit"
@@ -176,31 +170,25 @@ export default function SignUp() {
                     setLoading(true);
                   },
                   onError: (ctx) => {
-                    // Verificar se é o erro específico de usuário já existente
                     if (
                       ctx.error.code === "USER_ALREADY_EXISTS" ||
                       (ctx.error.message && ctx.error.message.includes("User already exists"))
                     ) {
-                      toast.error("Este email já está cadastrado. Por favor, use outro email ou faça login.");
+                      toast.error("This email is already registered. Please use another email or login.");
                     } else {
-                      toast.error(ctx.error.message || "Erro ao criar conta. Tente novamente.");
+                      toast.error(ctx.error.message || "Error creating account. Please try again.");
                     }
                   },
                   onSuccess: async (data) => {
-                    // Verifica se o usuário foi realmente criado
-                    console.log(data);
                     try {
-                      // Verificar sessão
-                      const response = await fetch("/api/auth/get-session");
-                      const sessionData = await response.json();
                       if (isAdmin) {
-                        await createAdmin(sessionData.user.id);
+                        await createAdmin(data.data.user.id);
                         router.push("/admin");
                       } else {
                         router.push("/");
                       }
                     } catch (error) {
-                      console.error("Erro ao verificar sessão após registro:", error);
+                      console.error("Error verifying session after registration:", error);
                     }
                   },
                 },
@@ -210,10 +198,10 @@ export default function SignUp() {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Processando...
+                Processing...
               </span>
             ) : (
-              "Criar conta"
+              "Create account"
             )}
           </Button>
         </div>

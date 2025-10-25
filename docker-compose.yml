@@ -1,11 +1,11 @@
 services:
   ai-api:
-    command: tail -f /dev/null
+    #command: tail -f /dev/null
     build:
       context: ./ai-api
       dockerfile: Dockerfile
     ports:
-      - 8000:8000
+      - 8080:8080
     env_file:
       - ./ai-api/.env
     volumes:

@@ -19,9 +19,9 @@ export default function SignIn() {
   return (
     <Card className="border-none shadow-none bg-background rounded-none min-h-[400px]">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-medium text-[var(--color-text-default)]">Entrar</CardTitle>
+        <CardTitle className="text-xl font-medium text-[var(--color-text-default)]">Login</CardTitle>
         <CardDescription className="text-[var(--color-text-subtle)]">
-          Digite seu email abaixo para acessar sua conta
+          Enter your email below to access your account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -66,19 +66,6 @@ export default function SignIn() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="remember"
-              onClick={() => {
-                setRememberMe(!rememberMe);
-              }}
-              className="border-secondary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-            />
-            <Label htmlFor="remember" className="text-[var(--color-text-subtle)]">
-              Lembrar de mim
-            </Label>
-          </div>
-
           <Button
             type="submit"
             variant="default"
@@ -113,10 +100,10 @@ export default function SignIn() {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Processando...
+                Processing...
               </span>
             ) : (
-              "Entrar"
+              "Login"
             )}
           </Button>
         </div>

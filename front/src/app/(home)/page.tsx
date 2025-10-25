@@ -1,13 +1,23 @@
 "use client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FolderOpen, Tag, User } from "lucide-react";
+import { FolderOpen, LogOut, Tag, User } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { data: session, isPending } = useSession();
-
+  const router = useRouter();
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
+  };
   if (isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -28,7 +38,7 @@ export default function Home() {
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Welcome {session?.user?.name ? `, ${session.user.name}` : ""}! Manage your image labeling groups and
-            contribute to dataset creation.
+            contribute to Paladium's dataset.
           </p>
         </div>
 
@@ -63,6 +73,9 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <CardDescription>{session?.user?.email || "Not signed in"}</CardDescription>
+              <Button variant="ghost" size="sm" className="cursor-pointer mb-2" onClick={() => handleSignOut()}>
+                <LogOut className="h-4 w-4 mr-1" /> Sign Out
+              </Button>
             </CardContent>
           </Card>
         </div>

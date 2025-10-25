@@ -28,6 +28,8 @@ export const ImageScalarFieldEnumSchema = z.enum(['id','filename','originalName'
 
 export const TagScalarFieldEnumSchema = z.enum(['id','value','source','createdById','imageId','createdAt','updatedAt']);
 
+export const LabelerUsageScalarFieldEnumSchema = z.enum(['id','userId','imageId','createdAt','updatedAt']);
+
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const QueryModeSchema = z.enum(['default','insensitive']);
@@ -175,3 +177,17 @@ export const TagSchema = z.object({
 })
 
 export type Tag = z.infer<typeof TagSchema>
+
+/////////////////////////////////////////
+// LABELER USAGE SCHEMA
+/////////////////////////////////////////
+
+export const LabelerUsageSchema = z.object({
+  id: z.cuid(),
+  userId: z.string(),
+  imageId: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type LabelerUsage = z.infer<typeof LabelerUsageSchema>
