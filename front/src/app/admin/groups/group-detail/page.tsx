@@ -15,7 +15,7 @@ import { useEffect } from "react";
 export default function GroupDetailPage() {
   const searchParams = useSearchParams();
   const { currentGroup, isLoading, getGroup } = useAdminStore();
-
+  console.log("currentGroup", currentGroup);
   useEffect(() => {
     getGroup(searchParams.get("groupId") || "");
   }, [searchParams, getGroup]);
@@ -27,7 +27,7 @@ export default function GroupDetailPage() {
     return <div className="p-8">Group not found</div>;
   }
   return (
-    <div className="p-8">
+    <div className="px-8 py-4">
       <div className="mb-6">
         <Link href="/admin/groups">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -66,22 +66,6 @@ export default function GroupDetailPage() {
             </CardHeader>
             <CardContent>
               <AssignUserSection groupId={currentGroup.id} currentMembers={currentGroup.members} />
-
-              <div className="mt-4 space-y-2">
-                {currentGroup.members.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">No labelers assigned yet</p>
-                ) : (
-                  currentGroup.members.map((member: any) => (
-                    <div key={member.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">{member.user.name}</p>
-                        <p className="text-xs text-muted-foreground">{member.user.email}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{new Date(member.joinedAt).toLocaleDateString()}</p>
-                    </div>
-                  ))
-                )}
-              </div>
             </CardContent>
           </Card>
 
