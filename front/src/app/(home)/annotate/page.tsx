@@ -62,13 +62,17 @@ export default function AnnotateImagePage() {
   useEffect(() => {
     async function fetchImage() {
       if (!imageId) {
-        setError("No image ID provided.");
         setIsLoading(false);
+        return;
+      }
+      if (!session?.user?.id) {
         return;
       }
       try {
         const result = await getImageById(imageId);
-        const labelerUsage = await getLabelerUsage(session?.user?.id || "", imageId);
+        console.log("result", result);
+        const labelerUsage = await getLabelerUsage(session?.user?.id, imageId);
+        console.log("labelerUsage", labelerUsage);
         if (labelerUsage.success && labelerUsage.labelerUsage) {
           setUsedAI(true);
         }
@@ -84,7 +88,7 @@ export default function AnnotateImagePage() {
       }
     }
     fetchImage();
-  }, [imageId]);
+  }, [imageId, isPending]);
 
   const handleAddTag = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,7 +191,7 @@ export default function AnnotateImagePage() {
     setEditingTagValue("");
   };
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -340,7 +344,7 @@ export default function AnnotateImagePage() {
           </form>
           <div className="text-xs text-muted-foreground mb-2">Example tags: "cat", "outdoor", "night", etc.</div>
           <Button onClick={handleSuggestTags} disabled={adding || usedAI} className="cursor-pointer w-full mb-4">
-            Suggest tags (AI)
+            {usedAI ? "Tags already suggested" : "Suggest tags (AI)"}
           </Button>
 
           {suggestedTags.length > 0 && (
