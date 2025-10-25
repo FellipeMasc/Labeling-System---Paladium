@@ -43,7 +43,6 @@ export default function ImageUploadSection({ groupId }: { groupId: string }) {
       const response = await fetch("/api/s3", {
         method: "POST",
         body: formData,
-        // Don't set Content-Type header - browser will set it with boundary for multipart/form-data
       });
 
       const result = await response.json();

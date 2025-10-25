@@ -3,12 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, ImageIcon } from "lucide-react";
+import { Trash2, ImageIcon, ExternalLink, Tag } from "lucide-react";
 import { deleteImage } from "@/actions/image_actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 type Image = {
   id: string;
@@ -86,11 +87,23 @@ export default function ImageGallery({ images }: { images: Image[] }) {
                 <Button
                   variant="destructive"
                   size="sm"
+                  className="cursor-pointer"
                   onClick={() => handleDelete(image.id)}
                   disabled={deleting === image.id}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
+                {image.status === "LABELED" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/admin/annotate?imageId=${image.id}`)}
+                  >
+                    <Tag className="h-4 w-4" />
+                    Check tags
+                  </Button>
+                )}
               </div>
 
               {/* Status badge (always visible) */}

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { keyof } from "zod";
 
 export async function deleteImage(imageId: string) {
   try {
@@ -49,6 +50,62 @@ export async function getImageById(imageId: string) {
       select: { id: true, originalName: true, filename: true, url: true, status: true, tags: true, groupId: true },
     });
     return { success: true, image };
+  } catch (error) {
+    console.error("Error getting image by ID:", error);
+    return { success: false, error: "Failed to get image by ID" };
+  }
+}
+
+export async function getImageTagsByIdForAdmin(imageId: string) {
+  try {
+    const queryResult = await prisma.$queryRaw<
+      {
+        imageId: string;
+        filename: string;
+        originalName: string;
+        url: string;
+        groupId: string;
+        tags: {
+          tagId: string;
+          name: string;
+          value: string;
+          source: "USER" | "AI" | "ADMIN";
+          createdAt: Date;
+          updatedAt: Date;
+        }[];
+      }[]
+    >`
+                with tags_and_users as (
+                  select t."imageId" , i.filename, i."originalName", i.url, i."groupId",  u."name", t.value, t."source", t."createdAt", t."updatedAt", t.id as "tagId" 
+                  from public.user u
+                  inner join public.tag t on t."createdById" = u.id 
+                  inner join public.image i on i.id = t."imageId" 
+                  where t."imageId" = ${imageId}
+                )
+                select tau."imageId", tau.filename, tau."originalName", tau.url, tau."groupId", jsonb_agg(jsonb_build_object(
+                'tagId', tau."tagId",
+                'name', tau."name",
+                'value', tau.value,
+                'source', tau.source,
+                'createdAt', tau."createdAt", 
+                'uptadeAt', tau."updatedAt"
+                )) as tags
+                from tags_and_users tau
+                group by tau."imageId", tau.filename, tau."originalName", tau.url, tau."groupId"
+    `;
+    const queryDict = queryResult[0];
+    if (!queryDict) {
+      return { success: false, error: "Image not found" };
+    }
+    const result = {
+      imageId: queryDict.imageId,
+      filename: queryDict.filename,
+      originalName: queryDict.originalName,
+      url: queryDict.url,
+      groupId: queryDict.groupId,
+      tags: queryDict.tags,
+    };
+    return { success: true, result };
   } catch (error) {
     console.error("Error getting image by ID:", error);
     return { success: false, error: "Failed to get image by ID" };
@@ -111,11 +168,14 @@ export async function removeTagFromImage(tagId: string) {
   }
 }
 
-export async function updateTag(tagId: string, value: string) {
+export async function updateTag(tagId: string, value: string, source: "USER" | "AI" | "ADMIN" = "USER") {
+  console.log("tagId", tagId);
+  console.log("value", value);
+  console.log("source", source);
   try {
     const tag = await prisma.tag.update({
       where: { id: tagId },
-      data: { value },
+      data: { value, source },
       select: { id: true, value: true, source: true, createdById: true, imageId: true, createdAt: true },
     });
     return { success: true, tag };
