@@ -5,13 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ImageUploadSection({ groupId }: { groupId: string }) {
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [autoUsersAssigning, setAutoUsersAssigning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
+  const session = useSession();
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -39,6 +43,8 @@ export default function ImageUploadSection({ groupId }: { groupId: string }) {
       selectedFiles.forEach((file) => {
         formData.append("files", file);
       });
+
+      formData.append("autoUsersAssigning", autoUsersAssigning ? "true" : "false");
 
       const response = await fetch("/api/s3", {
         method: "POST",
@@ -99,7 +105,15 @@ export default function ImageUploadSection({ groupId }: { groupId: string }) {
           </Button>
         )}
       </div>
-
+      <div className="flex items-center gap-4">
+        <Checkbox
+          id="autoUsersAssigning"
+          checked={autoUsersAssigning}
+          onClick={() => setAutoUsersAssigning(!autoUsersAssigning)}
+          className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+        />
+        <Label htmlFor="autoUsersAssigning">Auto-assign users to images</Label>
+      </div>
       {selectedFiles.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Selected files:</p>

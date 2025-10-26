@@ -1,14 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { S3Lib } from "@/lib/s3-lib";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
-import { keyof } from "zod";
 
 export async function deleteImage(imageId: string) {
   try {
     const image = await prisma.image.findUnique({
       where: { id: imageId },
-      select: { groupId: true },
+      select: { groupId: true, filename: true },
     });
 
     await prisma.image.delete({
@@ -16,6 +17,12 @@ export async function deleteImage(imageId: string) {
     });
 
     if (image) {
+      const s3 = S3Lib.getInstance();
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `images/${image.groupId}/${image.filename}`,
+      });
+      await s3.send(command);
       revalidatePath("/admin/groups");
       revalidatePath(`/admin/groups/${image.groupId}`);
     }

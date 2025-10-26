@@ -1,6 +1,6 @@
 services:
   ai-api:
-    #command: tail -f /dev/null
+    command: tail -f /dev/null
     build:
       context: ./ai-api
       dockerfile: Dockerfile

@@ -12,7 +12,7 @@ import type { Prisma } from '@prisma/client';
 
 export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','name','email','emailVerified','image','admin','createdAt','updatedAt']);
+export const UserScalarFieldEnumSchema = z.enum(['id','name','email','emailVerified','image','admin','createdAt','updatedAt','likelihoodScore']);
 
 export const SessionScalarFieldEnumSchema = z.enum(['id','expiresAt','token','createdAt','updatedAt','ipAddress','userAgent','userId']);
 
@@ -26,7 +26,7 @@ export const GroupMemberScalarFieldEnumSchema = z.enum(['id','userId','groupId',
 
 export const ImageScalarFieldEnumSchema = z.enum(['id','filename','originalName','url','groupId','status','createdAt','updatedAt']);
 
-export const TagScalarFieldEnumSchema = z.enum(['id','value','source','createdById','imageId','createdAt','updatedAt']);
+export const TagScalarFieldEnumSchema = z.enum(['id','value','source','createdById','likelihoodScore','imageId','createdAt','updatedAt']);
 
 export const LabelerUsageScalarFieldEnumSchema = z.enum(['id','userId','imageId','createdAt','updatedAt']);
 
@@ -61,6 +61,7 @@ export const UserSchema = z.object({
   admin: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  likelihoodScore: z.number().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -171,6 +172,7 @@ export const TagSchema = z.object({
   id: z.cuid(),
   value: z.string(),
   createdById: z.string(),
+  likelihoodScore: z.number().nullable(),
   imageId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
