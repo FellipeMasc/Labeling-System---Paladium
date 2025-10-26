@@ -1,9 +1,22 @@
+"use client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LayoutDashboard, Layers, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Layers, Users, Settings, LogOut } from "lucide-react";
+import { signOut } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
+  const router = useRouter();
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
+  };
   const sections = [
     {
       title: "Dashboard",
@@ -26,6 +39,11 @@ export default function AdminPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Admin Panel</h1>
         <p className="text-muted-foreground">Manage your image labeling system</p>
+        <div className="mt-8">
+          <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => handleSignOut()}>
+            <LogOut className="h-4 w-4 mr-1" /> Sign Out
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

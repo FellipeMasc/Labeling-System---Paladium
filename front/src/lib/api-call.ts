@@ -1,4 +1,8 @@
-export async function apiCall(url: string, token: string, options: RequestInit = {}): Promise<any> {
+export async function apiCall(
+  url: string,
+  token: string,
+  options: RequestInit = {}
+): Promise<{ data: any; status: number }> {
   const headers = {
     ...(options.headers || {}),
     Authorization: `Bearer ${token}`,
@@ -13,7 +17,8 @@ export async function apiCall(url: string, token: string, options: RequestInit =
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || response.statusText);
   }
-  return response.json();
+  const data = await response.json();
+  return { data, status: response.status };
 }
 
 export function apiCallBackground(url: string, token: string, options: RequestInit = {}): void {
