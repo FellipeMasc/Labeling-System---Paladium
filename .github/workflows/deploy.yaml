@@ -1,6 +1,9 @@
 name: Deploy GCP
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     types: [closed]
     branches:

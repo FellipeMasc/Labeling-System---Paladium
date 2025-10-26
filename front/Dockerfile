@@ -1,6 +1,6 @@
 FROM node:22-alpine as base
 WORKDIR /app
-COPY package*.json ./
+COPY front/package*.json ./
 
 ARG AWS_REGION
 ARG AWS_BUCKET_NAME
@@ -16,7 +16,7 @@ RUN npm install --legacy-peer-deps
 
 FROM base as builder
 WORKDIR /app
-COPY . .
+COPY front/ .
 RUN npx prisma generate
 RUN npm install @tailwindcss/postcss --legacy-peer-deps
 
