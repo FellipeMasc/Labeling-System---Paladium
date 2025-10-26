@@ -11,6 +11,16 @@ services:
     volumes:
       - ./ai-api:/app
 
+  front:
+    build:
+      dockerfile: front/Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - ./front/.env
+    volumes:
+      - ./front:/app
+
   postgres:
     image: postgres:15
     ports:
