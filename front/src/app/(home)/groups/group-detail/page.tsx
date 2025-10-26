@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getGroupById } from "@/actions/group_actions";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Image as ImageIcon, ArrowLeft, Tag as TagIcon, ExternalLink } from "lucide-react";
+import { Users, Image as ImageIcon, ArrowLeft, Tag as TagIcon, ExternalLink, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -51,7 +51,7 @@ type GroupType = {
   createdAt: string | Date;
 };
 
-export default function GroupDetailPage() {
+function GroupDetailPageContent() {
   const searchParams = useSearchParams();
   const groupId = searchParams.get("groupId") || "";
   const [group, setGroup] = useState<GroupType | null>(null);
@@ -228,5 +228,19 @@ export default function GroupDetailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function GroupDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <GroupDetailPageContent />
+    </Suspense>
   );
 }

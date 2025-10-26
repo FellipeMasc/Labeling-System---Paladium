@@ -1,0 +1,14 @@
+name: Deploy GCP
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/gcp-deploy.yaml
+    with:
+      APP_NAME: front-case
+    secrets: inherit

@@ -2,17 +2,16 @@
 import { getGroupById } from "@/actions/group_actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Upload, UserPlus } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import ImageUploadSection from "./ImageUploadSection";
 import AssignUserSection from "./AssignUserSection";
 import ImageGallery from "./ImageGallery";
 import { useSearchParams } from "next/navigation";
 import { useAdminStore } from "@/store/admin_store";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
-export default function GroupDetailPage() {
+function GroupDetailPageContent() {
   const searchParams = useSearchParams();
   const { currentGroup, isLoading, getGroup } = useAdminStore();
   console.log("currentGroup", currentGroup);
@@ -107,5 +106,19 @@ export default function GroupDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GroupDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <GroupDetailPageContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ function getTagColor(source: string) {
   }
 }
 
-export default function AdminAnnotatePage() {
+function AdminAnnotatePageContent() {
   const searchParams = useSearchParams();
   const imageId = searchParams.get("imageId") || "";
 
@@ -296,5 +296,19 @@ export default function AdminAnnotatePage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AdminAnnotatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <AdminAnnotatePageContent />
+    </Suspense>
   );
 }
