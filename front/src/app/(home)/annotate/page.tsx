@@ -12,6 +12,7 @@ import { getImageById, addTagToImage, removeTagFromImage, updateTag } from "@/ac
 import { useSession } from "@/lib/auth-client";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { addLabelerUsage, getLabelerUsage } from "@/actions/labeler_actions";
+import { apiCall } from "@/lib/api-call";
 
 const getTagColor = (source: string) => {
   switch (source) {
@@ -42,22 +43,27 @@ function AnnotateImagePageContent() {
   const [usedAI, setUsedAI] = useState(false);
 
   const handleSuggestTags = async () => {
-    const result = await fetch(`${process.env.AI_API_URL}/users/infer-tags`, {
-      method: "POST",
-      body: JSON.stringify({ image_url: image.url, user_id: session?.user?.id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await result.json();
-    console.log("data", data);
-    if (result.ok) {
+    setAdding(true);
+    const { data, status } = await apiCall(
+      `${process.env.AI_API_URL}/users/infer-tags`,
+      session?.session?.token || "",
+      {
+        method: "POST",
+        body: JSON.stringify({ image_url: image.url, user_id: session?.user?.id }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (status === 200) {
       setSuggestedTags(data);
       const result = await addLabelerUsage(session?.user?.id || "", imageId);
       if (result.success && result.labelerUsage) {
         setUsedAI(true);
       }
     }
+    setAdding(false);
   };
   useEffect(() => {
     async function fetchImage() {
@@ -70,9 +76,7 @@ function AnnotateImagePageContent() {
       }
       try {
         const result = await getImageById(imageId);
-        console.log("result", result);
         const labelerUsage = await getLabelerUsage(session?.user?.id, imageId);
-        console.log("labelerUsage", labelerUsage);
         if (labelerUsage.success && labelerUsage.labelerUsage) {
           setUsedAI(true);
         }
