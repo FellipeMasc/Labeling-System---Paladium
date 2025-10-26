@@ -5,9 +5,17 @@ import json
 client = openai.OpenAI()
 
 class inference_agent:
-    def __init__(self, model: str = "gpt-4.1-mini"):
-        self.model = model
-        self.client = openai.OpenAI()
+    _instance = None
+
+    def __new__(cls, model: str = "gpt-4.1-mini"):
+        if cls._instance is None:
+            cls._instance = super(inference_agent, cls).__new__(cls)
+            cls._instance.model = model
+            cls._instance.client = openai.OpenAI()
+        return cls._instance
+        
+    def get_client(self) -> openai.OpenAI:
+        return self.client
         
     def get_prompt(self) -> str:
         return """

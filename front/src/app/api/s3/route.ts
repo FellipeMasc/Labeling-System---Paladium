@@ -3,13 +3,19 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { apiCallBackground } from "@/lib/api-call";
+import { verifyAdmin } from "@/lib/auth-helpers";
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse FormData
+    const userAdmin = await verifyAdmin(request);
+    if (!userAdmin) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
     const formData = await request.formData();
     const groupId = formData.get("groupId") as string;
     const files = formData.getAll("files") as File[];
+    const autoUsersAssigning = formData.get("autoUsersAssigning") === "true" ? true : false;
 
     if (!groupId) {
       return NextResponse.json({ success: false, error: "Group ID is required" }, { status: 400 });
@@ -65,7 +71,13 @@ export async function POST(request: NextRequest) {
       console.log(`✓ Uploaded: ${file.name} -> ${filename}`);
     }
 
-    // Revalidate pages
+    // leverage available pool and automatically assign users to this group (background process)
+    if (autoUsersAssigning) {
+      apiCallBackground(`${process.env.AI_API_URL}/admins/auto-users-assign`, userAdmin.token || "", {
+        method: "POST",
+        body: JSON.stringify({ group_id: groupId }),
+      });
+    }
     revalidatePath("/admin/groups");
     revalidatePath(`/admin/groups/${groupId}`);
 

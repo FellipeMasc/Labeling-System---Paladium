@@ -154,6 +154,24 @@ export async function assignUserToGroup(userId: string, groupId: string) {
   }
 }
 
+export async function assignMultipleUsersToGroup(userIds: string[], groupId: string) {
+  try {
+    const members = await prisma.groupMember.createMany({
+      data: userIds.map((userId) => ({
+        userId,
+        groupId,
+      })),
+      skipDuplicates: true,
+    });
+    revalidatePath("/admin/groups");
+    revalidatePath("/admin/groups/group-detail");
+    return { success: true, count: members.count };
+  } catch (error) {
+    console.error("Error assigning users to group:", error);
+    return { success: false, error: "Failed to assign users to group" };
+  }
+}
+
 export async function removeUserFromGroup(userId: string, groupId: string) {
   try {
     await prisma.groupMember.delete({

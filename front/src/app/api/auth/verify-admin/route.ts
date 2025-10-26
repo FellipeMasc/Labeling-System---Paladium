@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   const sessionCookie =
     request.cookies.get("better-auth.session_token")?.value ||
     request.cookies.get("__Secure-better-auth.session_token")?.value;
-  console.log("sessionCookie", sessionCookie);
+
   if (!sessionCookie) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
       admin: true,
     },
   });
-  if (!user) {
+  if (!user || !user.admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.json({ admin: user.admin }, { status: 200 });
+  return NextResponse.json({ session: session }, { status: 200 });
 }

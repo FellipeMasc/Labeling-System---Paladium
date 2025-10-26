@@ -15,19 +15,20 @@ datasource db {
 }
 
 model User {
-  id            String         @id
-  name          String
-  email         String
-  emailVerified Boolean        @default(false)
-  image         String?
-  admin         Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @default(now()) @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  groupMembers  GroupMember[]
-  labelerUsage  LabelerUsage[]
-  tags          Tag[]
+  id              String         @id
+  name            String
+  email           String
+  emailVerified   Boolean        @default(false)
+  image           String?
+  admin           Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now()) @updatedAt
+  likelihoodScore Float?         @default(0)
+  sessions        Session[]
+  accounts        Account[]
+  groupMembers    GroupMember[]
+  labelerUsage    LabelerUsage[]
+  tags            Tag[]
 
   @@unique([email])
   @@map("user")
@@ -129,15 +130,16 @@ enum ImageStatus {
 }
 
 model Tag {
-  id          String    @id @default(cuid())
-  value       String
-  source      TagSource
-  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdById String
-  imageId     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  image       Image     @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  value           String
+  source          TagSource
+  createdBy       User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById     String
+  likelihoodScore Float?    @default(0)
+  imageId         String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  image           Image     @relation(fields: [imageId], references: [id], onDelete: Cascade)
 
   @@index([imageId])
   @@index([createdById])

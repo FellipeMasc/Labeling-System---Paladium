@@ -42,7 +42,7 @@ function AnnotateImagePageContent() {
   const [usedAI, setUsedAI] = useState(false);
 
   const handleSuggestTags = async () => {
-    const result = await fetch(`${process.env.AI_API_URL}/infer-tags`, {
+    const result = await fetch(`${process.env.AI_API_URL}/users/infer-tags`, {
       method: "POST",
       body: JSON.stringify({ image_url: image.url, user_id: session?.user?.id }),
       headers: {
