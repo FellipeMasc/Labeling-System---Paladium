@@ -14,10 +14,12 @@ async def get_current_session(request: Request, db: connection = Depends(db_pg_c
     
     with db as conn:
         with conn.cursor() as cursor:
-            cursor.execute("""SELECT * FROM public.session inner join public.user on public.session."userId" = public.user."id" WHERE "token" = %s""", (token,))
+            cursor.execute("""SELECT "userId" FROM public.session inner join public.user on public.session."userId" = public.user."id" WHERE "token" = %s""", (token,))
             session = cursor.fetchone()
             if session is None:
                 raise HTTPException(status_code=404, detail="Session not found")
+            
+    return session
             
 async def get_current_admin_session(request: Request, db: connection = Depends(db_pg_connection)):
     auth_header = request.headers.get("Authorization")

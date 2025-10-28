@@ -27,6 +27,7 @@ export const useAdminStore = create<AdminStore>((set) => ({
     unlabeledImages: 0,
     labeledImages: 0,
     reviewedImages: 0,
+    averageUsersLikelihoodScore: 0,
   },
   group: {
     id: "",

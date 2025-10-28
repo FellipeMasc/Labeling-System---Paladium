@@ -123,6 +123,15 @@ model Image {
   @@map("image")
 }
 
+model imageContext {
+  id      String  @id @default(cuid())
+  imageId String
+  context Float[]
+
+  @@index([imageId])
+  @@map("image_context")
+}
+
 enum ImageStatus {
   UNLABELED
   LABELED

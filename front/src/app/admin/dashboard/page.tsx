@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAdminStore } from "@/store/admin_store";
-import { Users, Layers, Image, CheckCircle, Clock, FileCheck } from "lucide-react";
+import { Users, Layers, Image, CheckCircle, Clock, FileCheck, BarChart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AdminDashboardPage() {
   const { stats, getStats, isLoading } = useAdminStore();
-
+  console.log("stats", stats);
   useEffect(() => {
     getStats();
   }, []);
@@ -66,6 +66,13 @@ export default function AdminDashboardPage() {
       description: "Reviewed images",
       icon: FileCheck,
       color: "text-emerald-500",
+    },
+    {
+      title: "Average Users Likelihood Score",
+      value: stats.averageUsersLikelihoodScore?.toFixed(2),
+      description: "Average likelihood score of users",
+      icon: BarChart,
+      color: "text-red-500",
     },
   ];
 

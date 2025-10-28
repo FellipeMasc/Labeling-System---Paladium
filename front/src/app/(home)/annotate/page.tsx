@@ -49,7 +49,7 @@ function AnnotateImagePageContent() {
       session?.session?.token || "",
       {
         method: "POST",
-        body: JSON.stringify({ image_url: image.url, user_id: session?.user?.id }),
+        body: JSON.stringify({ image_url: image.url, image_id: imageId }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -99,7 +99,13 @@ function AnnotateImagePageContent() {
     if (!tagInput.trim()) return;
     setAdding(true);
     try {
-      const result = await addTagToImage(image.id, tagInput.trim(), session?.user?.id || "", source);
+      const result = await addTagToImage(
+        image.id,
+        tagInput.trim(),
+        session?.user?.id || "",
+        source,
+        session?.session?.token || ""
+      );
       if (result.success && result.tag) {
         setImage({
           ...image,
@@ -120,7 +126,13 @@ function AnnotateImagePageContent() {
   const handleAddSuggestedTag = async (tagValue: string) => {
     setAdding(true);
     try {
-      const result = await addTagToImage(image.id, tagValue, session?.user?.id || "", "AI");
+      const result = await addTagToImage(
+        image.id,
+        tagValue,
+        session?.user?.id || "",
+        "AI",
+        session?.session?.token || ""
+      );
       if (result.success && result.tag) {
         setImage({
           ...image,
@@ -165,13 +177,14 @@ function AnnotateImagePageContent() {
   };
 
   const handleSaveEditTag = async (tagId: string) => {
+    const token = session?.session?.token || "";
     if (!editingTagValue.trim()) {
       toast.error("Tag value cannot be empty");
       return;
     }
     setAdding(true);
     try {
-      const result = await updateTag(tagId, editingTagValue.trim());
+      const result = await updateTag(tagId, editingTagValue.trim(), token);
       if (result.success && result.tag) {
         setImage({
           ...image,
@@ -293,27 +306,30 @@ function AnnotateImagePageContent() {
                         </Button>
                       </div>
                     ) : (
-                      <Badge variant="outline" className={`${getTagColor(tag.source)} pr-1`}>
-                        {tag.value}
-                        <span className="ml-1 text-xs opacity-60">{tag.source || "USER"}</span>
-                        {tag.createdById === session?.user?.id && (
-                          <div className="inline-flex ml-1 gap-0.5">
-                            <button
-                              onClick={() => handleStartEditTag(tag.id, tag.value)}
-                              className="hover:bg-black/10 dark:hover:bg-white/10 rounded p-0.5"
-                              disabled={adding}
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => handleRemoveTag(tag.id)}
-                              className="hover:bg-black/10 dark:hover:bg-white/10 rounded p-0.5"
-                              disabled={adding}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        )}
+                      <Badge variant="outline" className={`${getTagColor(tag.source)} pr-1 flex-col`}>
+                        <div className="flex items-center">
+                          {tag.value}
+                          <span className="ml-1 text-xs opacity-60">{tag.source || "USER"}</span>
+                          {tag.createdById === session?.user?.id && (
+                            <div className="inline-flex ml-1 gap-0.5">
+                              <button
+                                onClick={() => handleStartEditTag(tag.id, tag.value)}
+                                className="hover:bg-black/10 dark:hover:bg-white/10 rounded p-0.5"
+                                disabled={adding}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => handleRemoveTag(tag.id)}
+                                className="hover:bg-black/10 dark:hover:bg-white/10 rounded p-0.5"
+                                disabled={adding}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-xs opacity-60">Likelihood Score: {tag.likelihoodScore?.toFixed(2)}</div>
                       </Badge>
                     )}
                   </div>

@@ -5,10 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tag as TagIcon, Loader2, ArrowLeft, X, Pencil, Save } from "lucide-react";
+import { Tag as TagIcon, Loader2, ArrowLeft, X, Pencil, Save, Check } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getImageById, getImageTagsByIdForAdmin, removeTagFromImage, updateTag } from "@/actions/image_actions";
+import { useSession } from "@/lib/auth-client";
 
 // Helper to color tags by source
 function getTagColor(source: string) {
@@ -41,10 +42,13 @@ function AdminAnnotatePageContent() {
       source: "USER" | "AI" | "ADMIN";
       createdAt: Date;
       updatedAt: Date;
+      likelihoodScore: number;
     }[];
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const session = useSession();
+  const token = session?.data?.session?.token || "";
 
   // Tag editing state
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
@@ -110,7 +114,7 @@ function AdminAnnotatePageContent() {
     }
     setEditing(true);
     try {
-      const result = await updateTag(tagId, editingTagValue.trim(), "ADMIN");
+      const result = await updateTag(tagId, editingTagValue.trim(), token, "ADMIN");
       if (result.success && result.tag) {
         setImage((prev) => {
           if (!prev) return prev;
@@ -131,6 +135,25 @@ function AdminAnnotatePageContent() {
       toast.error("Error updating tag");
     } finally {
       setEditing(false);
+    }
+  };
+
+  const handleApproveTag = async (tagId: string, value: string) => {
+    setEditing(true);
+    try {
+      const result = await updateTag(tagId, value, token, "ADMIN");
+      if (result.success && result.tag) {
+        setImage((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            tags: prev.tags.map((tag) => (tag.tagId === tagId ? { ...tag, source: "ADMIN" } : tag)),
+          };
+        });
+      }
+      toast.success("Tag approved!");
+    } catch {
+      toast.error("Error approving tag");
     }
   };
 
@@ -259,6 +282,7 @@ function AdminAnnotatePageContent() {
                       ) : (
                         <span className="italic">Unknown</span>
                       )}
+                      <div className="text-xs opacity-60">Likelihood Score: {tag.likelihoodScore?.toFixed(2)}</div>
                     </span>
                     <div className="flex gap-0.5">
                       {editingTagId !== tag.tagId && (
@@ -278,6 +302,14 @@ function AdminAnnotatePageContent() {
                             title="Remove"
                           >
                             <X className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => handleApproveTag(tag.tagId, tag.value)}
+                            className="hover:bg-black/10 dark:hover:bg-white/10 rounded p-0.5"
+                            disabled={editing}
+                            title="Approve"
+                          >
+                            <Check className="h-3 w-3" />
                           </button>
                         </>
                       )}

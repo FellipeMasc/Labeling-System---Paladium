@@ -26,6 +26,8 @@ export const GroupMemberScalarFieldEnumSchema = z.enum(['id','userId','groupId',
 
 export const ImageScalarFieldEnumSchema = z.enum(['id','filename','originalName','url','groupId','status','createdAt','updatedAt']);
 
+export const ImageContextScalarFieldEnumSchema = z.enum(['id','imageId','context']);
+
 export const TagScalarFieldEnumSchema = z.enum(['id','value','source','createdById','likelihoodScore','imageId','createdAt','updatedAt']);
 
 export const LabelerUsageScalarFieldEnumSchema = z.enum(['id','userId','imageId','createdAt','updatedAt']);
@@ -162,6 +164,18 @@ export const ImageSchema = z.object({
 })
 
 export type Image = z.infer<typeof ImageSchema>
+
+/////////////////////////////////////////
+// IMAGE CONTEXT SCHEMA
+/////////////////////////////////////////
+
+export const imageContextSchema = z.object({
+  id: z.cuid(),
+  imageId: z.string(),
+  context: z.number().array(),
+})
+
+export type imageContext = z.infer<typeof imageContextSchema>
 
 /////////////////////////////////////////
 // TAG SCHEMA
