@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export const createAdmin = async (userId: string) => {
-  console.log("userId", userId);
   try {
     await prisma.user.update({
       where: { id: userId },
