@@ -161,7 +161,7 @@ export default function SignUp() {
                 email,
                 password,
                 name: `${firstName}`,
-                callbackURL: "/",
+                //callbackURL: "/",
                 fetchOptions: {
                   onResponse: () => {
                     setLoading(false);
@@ -182,11 +182,14 @@ export default function SignUp() {
                   onSuccess: async (data) => {
                     try {
                       if (isAdmin) {
-                        await createAdmin(data.data.user.id);
-                        router.push("/admin");
-                      } else {
-                        router.push("/");
+                        const result = await createAdmin(data.data.user.id);
+                        if (result.success) {
+                          toast.success("Admin created successfully");
+                        } else {
+                          toast.error(result.message);
+                        }
                       }
+                      window.location.href = "/";
                     } catch (error) {
                       console.error("Error verifying session after registration:", error);
                     }
