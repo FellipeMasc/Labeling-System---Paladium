@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export default function AdminDashboardPage() {
   const { stats, getStats, isLoading } = useAdminStore();
-  console.log("stats", stats);
+
   useEffect(() => {
     getStats();
   }, []);

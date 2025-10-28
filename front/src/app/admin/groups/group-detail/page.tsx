@@ -13,11 +13,11 @@ import { Suspense, useEffect } from "react";
 
 function GroupDetailPageContent() {
   const searchParams = useSearchParams();
-  const { currentGroup, isLoading, getGroup } = useAdminStore();
-  console.log("currentGroup", currentGroup);
+  const { currentGroup, isLoading, getGroup, isRefreshing } = useAdminStore();
+
   useEffect(() => {
     getGroup(searchParams.get("groupId") || "");
-  }, [searchParams, getGroup]);
+  }, [searchParams, getGroup, isRefreshing]);
 
   if (isLoading) {
     return <div className="p-8">Loading...</div>;

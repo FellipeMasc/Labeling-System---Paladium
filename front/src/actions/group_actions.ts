@@ -12,6 +12,7 @@ export async function createGroup(name: string, description?: string) {
       },
     });
     revalidatePath("/admin/groups");
+    revalidatePath("/admin");
     return { success: true, group };
   } catch (error) {
     console.error("Error creating group:", error);

@@ -2,20 +2,18 @@
 import { getGroups } from "@/actions/group_actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Users, Image as ImageIcon } from "lucide-react";
+import { Plus, Users, Image as ImageIcon, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import CreateGroupDialog from "./CreateGroupDialog";
 import { useAdminStore } from "@/store/admin_store";
 import { useEffect } from "react";
 
 export default function AdminGroupsPage() {
-  const { groups, isLoading, getGroups } = useAdminStore();
+  const { groups, isLoading, getGroups, isRefreshing } = useAdminStore();
 
   useEffect(() => {
     getGroups();
-  }, [getGroups]);
-
-  console.log(groups);
+  }, [getGroups, isRefreshing]);
 
   if (isLoading) {
     return <div className="p-8">Loading...</div>;
@@ -30,6 +28,12 @@ export default function AdminGroupsPage() {
           <h1 className="text-3xl font-bold mb-2">Groups</h1>
           <p className="text-muted-foreground">Manage image groups and assign labelers</p>
         </div>
+        <Link href="/admin">
+          <Button variant="ghost" size="sm" className="mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Admin home
+          </Button>
+        </Link>
         <CreateGroupDialog />
       </div>
 

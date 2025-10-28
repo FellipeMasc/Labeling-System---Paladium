@@ -7,6 +7,7 @@ import { UserPlus, Loader2, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getAvailableLabelers, assignMultipleUsersToGroup, removeUserFromGroup } from "@/actions/group_actions";
+import { useAdminStore } from "@/store/admin_store";
 
 type User = {
   id: string;
@@ -27,14 +28,14 @@ export default function AssignUserSection({ groupId, currentMembers }: { groupId
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const router = useRouter();
-
+  const { setRefreshing } = useAdminStore();
   useEffect(() => {
     loadAvailableUsers();
   }, []);
 
   const loadAvailableUsers = async () => {
     const result = await getAvailableLabelers();
-    console.log("result", result);
+
     if (result.success && result.users) {
       // Filter out users already in the group
       const memberIds = currentMembers.map((m) => m.userId);
@@ -69,6 +70,7 @@ export default function AssignUserSection({ groupId, currentMembers }: { groupId
       toast.success(`${result.count} user(s) assigned successfully`);
       setSelectedUserIds([]);
       router.refresh();
+      setRefreshing(true);
       loadAvailableUsers();
     } else {
       toast.error(result.error || "Failed to assign users");

@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,8 @@ function AdminAnnotatePageContent() {
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingTagValue, setEditingTagValue] = useState<string>("");
   const [editing, setEditing] = useState(false);
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     async function fetchImage() {
       setIsLoading(true);
@@ -70,12 +71,13 @@ function AdminAnnotatePageContent() {
         setError("Failed to fetch image.");
       } finally {
         setIsLoading(false);
+        setIsRefreshing(false);
       }
     }
     if (imageId) {
       fetchImage();
     }
-  }, [imageId]);
+  }, [imageId, isRefreshing]);
 
   const handleRemoveTag = async (tagId: string) => {
     setEditing(true);
@@ -87,6 +89,8 @@ function AdminAnnotatePageContent() {
           tags: prev.tags.filter((tag: { tagId: string }) => tag.tagId !== tagId),
         }));
         toast.success("Tag removed!");
+        router.refresh();
+        setIsRefreshing(true);
       } else {
         toast.error("Could not remove tag");
       }
@@ -126,8 +130,10 @@ function AdminAnnotatePageContent() {
           };
         });
         toast.success("Tag updated!");
+        router.refresh();
         setEditingTagId(null);
         setEditingTagValue("");
+        setIsRefreshing(true);
       } else {
         toast.error("Could not update tag");
       }
@@ -152,6 +158,8 @@ function AdminAnnotatePageContent() {
         });
       }
       toast.success("Tag approved!");
+      router.refresh();
+      setIsRefreshing(true);
     } catch {
       toast.error("Error approving tag");
     }
