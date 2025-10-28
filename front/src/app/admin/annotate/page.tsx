@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tag as TagIcon, Loader2, ArrowLeft, X, Pencil, Save, Check } from "lucide-react";
+import { Tag as TagIcon, Loader2, ArrowLeft, X, Pencil, Save, Check, Tag, Download } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getImageById, getImageTagsByIdForAdmin, removeTagFromImage, updateTag } from "@/actions/image_actions";
@@ -165,6 +165,23 @@ function AdminAnnotatePageContent() {
     }
   };
 
+  const handleDownloadJSONInfo = () => {
+    const jsonInfo = {
+      imageId: image?.imageId,
+      filename: image?.filename,
+      originalName: image?.originalName,
+      tags: image?.tags,
+      groupId: image?.groupId,
+    };
+    const jsonInfoString = JSON.stringify(jsonInfo, null, 2);
+    const blob = new Blob([jsonInfoString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${image?.originalName}.json`;
+    a.click();
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -206,6 +223,15 @@ function AdminAnnotatePageContent() {
             </span>
             <br />
             <span className="text-xs opacity-60">{image.filename}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="cursor-pointer ml-2 mt-2"
+              onClick={() => handleDownloadJSONInfo()}
+            >
+              <Download className="h-4 w-4" />
+              Download JSON info
+            </Button>
           </CardDescription>
         </CardHeader>
         <CardContent>
