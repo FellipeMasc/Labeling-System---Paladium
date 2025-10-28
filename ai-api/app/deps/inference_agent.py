@@ -25,12 +25,13 @@ class inference_agent:
         """
 
     def get_prompt_infer_image_tags(self, group_name: str, group_description: str, tags: List[str]) -> str:
+        current_tags = ', '.join(tags) if tags is not None else ''
         return f"""
         You are a helpful assistant.
         Given this image, provide a comma-separated list of 3 possible tags describing what the image contains.
         Be brief and generic. Example: 'cat, window, sunlight'
         The group name is {group_name} and the group description is {group_description}.
-        The current tags are {', '.join(tags)}.
+        The current tags are  {current_tags}.
         """
 
     def infer_image_tags(self, request: TagInferenceRequest) -> TagInferenceResponse:
