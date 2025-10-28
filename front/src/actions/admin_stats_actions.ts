@@ -11,7 +11,8 @@ export async function getAdminStats() {
     let unlabeledImages = 0;
     let labeledImages = 0;
     let reviewedImages = 0;
-
+    let averageUsersLikelihoodScore = 0;
+    let result: { avg: number }[] | undefined;
     await prisma.$transaction(async (tx) => {
       totalUsers = await tx.user.count();
       totalGroups = await tx.group.count();
@@ -20,6 +21,8 @@ export async function getAdminStats() {
       unlabeledImages = await tx.image.count({ where: { status: "UNLABELED" } });
       labeledImages = await tx.image.count({ where: { status: "LABELED" } });
       reviewedImages = await tx.image.count({ where: { status: "REVIEWED" } });
+      result = await tx.$queryRaw<{ avg: number }[]>`SELECT AVG("likelihoodScore") FROM public.user`;
+      averageUsersLikelihoodScore = result ? result[0].avg : 0;
     });
 
     return {
@@ -32,6 +35,7 @@ export async function getAdminStats() {
         unlabeledImages,
         labeledImages,
         reviewedImages,
+        averageUsersLikelihoodScore,
       },
     };
   } catch (error) {

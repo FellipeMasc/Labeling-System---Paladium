@@ -1,5 +1,6 @@
 "use server";
 
+import { apiCallBackground } from "@/lib/api-call";
 import { prisma } from "@/lib/prisma";
 import { S3Lib } from "@/lib/s3-lib";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -79,11 +80,12 @@ export async function getImageTagsByIdForAdmin(imageId: string) {
           source: "USER" | "AI" | "ADMIN";
           createdAt: Date;
           updatedAt: Date;
+          likelihoodScore: number;
         }[];
       }[]
     >`
                 with tags_and_users as (
-                  select t."imageId" , i.filename, i."originalName", i.url, i."groupId",  u."name", t.value, t."source", t."createdAt", t."updatedAt", t.id as "tagId" 
+                  select t."imageId" , i.filename, i."originalName", i.url, i."groupId",  u."name", t.value, t."source", t."createdAt", t."updatedAt", t.id as "tagId", t."likelihoodScore"
                   from public.user u
                   inner join public.tag t on t."createdById" = u.id 
                   inner join public.image i on i.id = t."imageId" 
@@ -95,7 +97,8 @@ export async function getImageTagsByIdForAdmin(imageId: string) {
                 'value', tau.value,
                 'source', tau.source,
                 'createdAt', tau."createdAt", 
-                'uptadeAt', tau."updatedAt"
+                'uptadeAt', tau."updatedAt",
+                'likelihoodScore', tau."likelihoodScore"
                 )) as tags
                 from tags_and_users tau
                 group by tau."imageId", tau.filename, tau."originalName", tau.url, tau."groupId"
@@ -119,7 +122,13 @@ export async function getImageTagsByIdForAdmin(imageId: string) {
   }
 }
 
-export async function addTagToImage(imageId: string, value: string, userId: string, source: "USER" | "AI" | "ADMIN") {
+export async function addTagToImage(
+  imageId: string,
+  value: string,
+  userId: string,
+  source: "USER" | "AI" | "ADMIN",
+  token: string
+) {
   try {
     const image = await prisma.image.findUnique({
       where: { id: imageId },
@@ -128,6 +137,10 @@ export async function addTagToImage(imageId: string, value: string, userId: stri
     const tag = await prisma.tag.create({
       data: { value, source, createdById: userId, imageId },
       select: { id: true, value: true, source: true, createdById: true, imageId: true, createdAt: true },
+    });
+    apiCallBackground(`${process.env.AI_API_URL}/users/update-likelihood-score`, token, {
+      method: "POST",
+      body: JSON.stringify({ tag_id: tag.id, label: value }),
     });
     console.log("image", image);
     await prisma.image.update({
@@ -147,11 +160,18 @@ export async function addTagToImage(imageId: string, value: string, userId: stri
 
 export async function removeTagFromImage(tagId: string) {
   try {
+    const tag = await prisma.tag.findUnique({
+      where: { id: tagId },
+      select: { imageId: true },
+    });
+    if (!tag) {
+      return { success: false, error: "Tag not found" };
+    }
     await prisma.tag.delete({
       where: { id: tagId },
     });
     const image = await prisma.image.findUnique({
-      where: { id: tagId },
+      where: { id: tag.imageId },
       select: { groupId: true },
     });
     if (image) {
@@ -159,12 +179,12 @@ export async function removeTagFromImage(tagId: string) {
       revalidatePath(`/annotate/${tagId}`);
     }
     revalidatePath(`/annotate/${tagId}`);
-    const thereIsNoTags = await prisma.tag.count({
-      where: { imageId: tagId },
+    const countTags = await prisma.tag.count({
+      where: { imageId: tag.imageId },
     });
-    if (thereIsNoTags === 0) {
+    if (countTags === 0) {
       await prisma.image.update({
-        where: { id: tagId },
+        where: { id: tag.imageId },
         data: { status: "UNLABELED" },
       });
     }
@@ -175,7 +195,7 @@ export async function removeTagFromImage(tagId: string) {
   }
 }
 
-export async function updateTag(tagId: string, value: string, source: "USER" | "AI" | "ADMIN" = "USER") {
+export async function updateTag(tagId: string, value: string, token: string, source: "USER" | "AI" | "ADMIN" = "USER") {
   console.log("tagId", tagId);
   console.log("value", value);
   console.log("source", source);
@@ -185,6 +205,18 @@ export async function updateTag(tagId: string, value: string, source: "USER" | "
       data: { value, source },
       select: { id: true, value: true, source: true, createdById: true, imageId: true, createdAt: true },
     });
+    if (source === "ADMIN") {
+      apiCallBackground(`${process.env.AI_API_URL}/admins/update-likelihood-score`, token, {
+        method: "POST",
+        body: JSON.stringify({ tag_id: tagId, label: value }),
+      });
+    }
+    if (source === "USER") {
+      apiCallBackground(`${process.env.AI_API_URL}/users/update-likelihood-score`, token, {
+        method: "POST",
+        body: JSON.stringify({ tag_id: tagId, label: value }),
+      });
+    }
     return { success: true, tag };
   } catch (error) {
     console.error("Error updating tag:", error);

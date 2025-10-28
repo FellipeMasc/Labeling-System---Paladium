@@ -8,6 +8,7 @@ export interface AdminStats {
   unlabeledImages: number;
   labeledImages: number;
   reviewedImages: number;
+  averageUsersLikelihoodScore: number;
 }
 
 // Clean DTOs for User

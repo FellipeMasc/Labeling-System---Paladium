@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
-
+  console.log(isAuthenticated);
   if (isPrivateRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
@@ -56,8 +56,15 @@ export async function middleware(request: NextRequest) {
     if (adminRes.status === 200) {
       return NextResponse.redirect(new URL("/admin", request.url));
     } else {
+      if (isLoginRoute) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
       return NextResponse.next();
     }
+  }
+
+  if (isAuthenticated && isLoginRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

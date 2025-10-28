@@ -13,19 +13,28 @@ class inference_agent:
             cls._instance.model = model
             cls._instance.client = openai.OpenAI()
         return cls._instance
-        
+
     def get_client(self) -> openai.OpenAI:
         return self.client
-        
-    def get_prompt(self) -> str:
+
+    def get_prompt_infer_image_description(self) -> str:
         return """
+        You are a helpful assistant.
+        Given this image, provide a description of what the image contains.
+        Be brief and generic. Example: 'A cat is sitting on a window sill, looking out the window.'
+        """
+
+    def get_prompt_infer_image_tags(self, group_name: str, group_description: str, tags: List[str]) -> str:
+        return f"""
         You are a helpful assistant.
         Given this image, provide a comma-separated list of 3 possible tags describing what the image contains.
         Be brief and generic. Example: 'cat, window, sunlight'
+        The group name is {group_name} and the group description is {group_description}.
+        The current tags are {', '.join(tags)}.
         """
-    
+
     def infer_image_tags(self, request: TagInferenceRequest) -> TagInferenceResponse:
-        prompt = self.get_prompt()
+        prompt = self.get_prompt_infer_image_tags(request.group_name, request.group_description, request.tags)
         response = self.client.responses.parse(
             model=self.model,
             input=[{
@@ -39,5 +48,31 @@ class inference_agent:
         )
         response_parsed = TagInferenceResponse.model_validate_json(response.output_text)
         return response_parsed.tags
-    
-    
+
+
+    def infer_image_description(self, image_url: str) -> str:
+        prompt = self.get_prompt_infer_image_description()
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": prompt
+                },
+                {
+                "role": "user",
+                "content": image_url,
+            }],
+        )
+        return response.choices[0].message.content
+
+    def create_embedding(self, image_url: str, names: list) -> list:
+        
+        description = self.infer_image_description(image_url)
+        
+        text_for_embedding = f"current tags: {', '.join(names)}\ndescription: {description}"
+
+        response = self.client.embeddings.create(
+            input=text_for_embedding, model="text-embedding-3-small", dimensions=384)
+
+        return response.data[0].embedding
