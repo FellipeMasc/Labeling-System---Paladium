@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAdminStore } from "@/store/admin_store";
 
 export default function ImageUploadSection({ groupId }: { groupId: string }) {
   const [uploading, setUploading] = useState(false);
@@ -16,6 +17,7 @@ export default function ImageUploadSection({ groupId }: { groupId: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const session = useSession();
+  const { setRefreshing } = useAdminStore();
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -62,7 +64,7 @@ export default function ImageUploadSection({ groupId }: { groupId: string }) {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      router.refresh();
+      setRefreshing(true);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload images");

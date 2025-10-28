@@ -8,6 +8,8 @@ interface AdminStore {
   stats: AdminStats;
   isLoading: boolean;
   currentGroup: any | null;
+  isRefreshing: boolean;
+  setRefreshing: (refreshing: boolean) => void;
   groups: any | null;
   setLoading: (loading: boolean) => void;
   setStats: (stats: AdminStats) => void;
@@ -19,6 +21,8 @@ interface AdminStore {
 export const useAdminStore = create<AdminStore>((set) => ({
   currentGroup: null,
   groups: null,
+  isRefreshing: false,
+  setRefreshing: (refreshing: boolean) => set({ isRefreshing: refreshing }),
   stats: {
     totalUsers: 0,
     totalGroups: 0,
@@ -53,7 +57,7 @@ export const useAdminStore = create<AdminStore>((set) => ({
   getGroup: async (groupId: string) => {
     set({ isLoading: true });
     const result = await getGroupById(groupId);
-    set({ isLoading: false });
+    set({ isLoading: false, isRefreshing: false });
     if (result.success) {
       set({ currentGroup: result.group });
     } else {
@@ -63,7 +67,7 @@ export const useAdminStore = create<AdminStore>((set) => ({
   getGroups: async () => {
     set({ isLoading: true });
     const result = await getGroups();
-    set({ isLoading: false });
+    set({ isLoading: false, isRefreshing: false });
     if (result.success) {
       set({ groups: result.groups });
     } else {

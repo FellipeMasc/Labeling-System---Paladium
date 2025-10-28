@@ -17,6 +17,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { createGroup } from "@/actions/group_actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAdminStore } from "@/store/admin_store";
 
 export default function CreateGroupDialog() {
   const [open, setOpen] = useState(false);
@@ -24,7 +25,7 @@ export default function CreateGroupDialog() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const { setRefreshing } = useAdminStore();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -41,7 +42,7 @@ export default function CreateGroupDialog() {
       setName("");
       setDescription("");
       setOpen(false);
-      router.refresh();
+      setRefreshing(true);
     } else {
       toast.error(result.error || "Failed to create group");
     }

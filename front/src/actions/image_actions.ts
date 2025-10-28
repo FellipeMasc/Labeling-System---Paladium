@@ -196,9 +196,6 @@ export async function removeTagFromImage(tagId: string) {
 }
 
 export async function updateTag(tagId: string, value: string, token: string, source: "USER" | "AI" | "ADMIN" = "USER") {
-  console.log("tagId", tagId);
-  console.log("value", value);
-  console.log("source", source);
   try {
     const tag = await prisma.tag.update({
       where: { id: tagId },
@@ -217,6 +214,8 @@ export async function updateTag(tagId: string, value: string, token: string, sou
         body: JSON.stringify({ tag_id: tagId, label: value }),
       });
     }
+    revalidatePath(`/admin/annotate?imageId=${tag.imageId}`);
+    revalidatePath(`/annotate?imageId=${tag.imageId}`);
     return { success: true, tag };
   } catch (error) {
     console.error("Error updating tag:", error);

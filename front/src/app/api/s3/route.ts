@@ -25,8 +25,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "No files provided" }, { status: 400 });
     }
 
-    console.log(`Uploading ${files.length} file(s) to group ${groupId}`);
-
     const s3 = S3Lib.getInstance();
     const uploadedImages = [];
 
@@ -68,7 +66,6 @@ export async function POST(request: NextRequest) {
       });
 
       uploadedImages.push(image);
-      console.log(`✓ Uploaded: ${file.name} -> ${filename}`);
     }
 
     // leverage available pool and automatically assign users to this group (background process)
@@ -79,7 +76,7 @@ export async function POST(request: NextRequest) {
       });
     }
     revalidatePath("/admin/groups");
-    revalidatePath(`/admin/groups/${groupId}`);
+    revalidatePath(`/admin/groups/group-detail?groupId=${groupId}`);
 
     return NextResponse.json({
       success: true,

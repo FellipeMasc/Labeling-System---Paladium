@@ -20,7 +20,7 @@ export async function getAdminStats() {
       totalLabelers = await tx.user.count({ where: { admin: false } });
       unlabeledImages = await tx.image.count({ where: { status: "UNLABELED" } });
       labeledImages = await tx.image.count({ where: { status: "LABELED" } });
-      reviewedImages = await tx.image.count({ where: { status: "REVIEWED" } });
+      reviewedImages = await tx.tag.count({ where: { source: "ADMIN" } });
       result = await tx.$queryRaw<{ avg: number }[]>`SELECT AVG("likelihoodScore") FROM public.user`;
       averageUsersLikelihoodScore = result ? result[0].avg : 0;
     });
