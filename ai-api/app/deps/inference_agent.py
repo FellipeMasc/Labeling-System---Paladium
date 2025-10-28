@@ -73,6 +73,6 @@ class inference_agent:
         text_for_embedding = f"current tags: {', '.join(names)}\ndescription: {description}"
 
         response = self.client.embeddings.create(
-            input=text_for_embedding, model="text-embedding-3-small", dimensions=384)
+            input=text_for_embedding, model="text-embedding-3-small", dimensions=1536)
 
         return response.data[0].embedding
