@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel, Optional
+from typing import List, Optional
+from pydantic import BaseModel
 
 class TagInferenceRequest(BaseModel):
     image_url: str
