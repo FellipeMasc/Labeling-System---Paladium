@@ -28,9 +28,9 @@ async def infer_tags(request: ApiTagsRequest, session: dict = Depends(auth_requi
                             from group_tags gt
                             group by gt."name", gt.description""", (request.image_id, request.image_id))
             group_tags = cursor.fetchone()
-            group_name = group_tags[0]
-            group_description = group_tags[1]
-            group_tags = group_tags[2]
+            group_name = group_tags[0] if group_tags is not None else None
+            group_description = group_tags[1] if group_tags is not None else None
+            group_tags = group_tags[2] if group_tags is not None else None
     agent = inference_agent()
     tags = agent.infer_image_tags(TagInferenceRequest(image_url=request.image_url, group_name=group_name, group_description=group_description, tags=group_tags))
     return tags

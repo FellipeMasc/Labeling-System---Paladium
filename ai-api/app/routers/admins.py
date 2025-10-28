@@ -54,8 +54,8 @@ async def update_likelihood_score(request: UpdateLikelihoodScoreRequest, session
                 image_id = image_info[0]
                 if image_id is None:
                     raise HTTPException(status_code=404, detail="Image from Tag not found")
-                image_url = image_info[1]
-                labels = image_info[2]
+                image_url = image_info[1] if image_info is not None else None
+                labels = image_info[2] if image_info is not None else None
         agent = inference_agent()
         embedding = agent.create_embedding(image_url, labels)
         with db() as conn:
