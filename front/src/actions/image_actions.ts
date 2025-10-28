@@ -142,7 +142,7 @@ export async function addTagToImage(
       method: "POST",
       body: JSON.stringify({ tag_id: tag.id, label: value }),
     });
-    console.log("image", image);
+
     await prisma.image.update({
       where: { id: imageId },
       data: { status: "LABELED" },
