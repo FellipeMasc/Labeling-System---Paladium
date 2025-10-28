@@ -41,6 +41,7 @@ function AnnotateImagePageContent() {
   const [editingTagValue, setEditingTagValue] = useState("");
   const { data: session, isPending } = useSession();
   const [usedAI, setUsedAI] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleSuggestTags = async () => {
     setAdding(true);
@@ -89,10 +90,11 @@ function AnnotateImagePageContent() {
         setError("Failed to fetch image.");
       } finally {
         setIsLoading(false);
+        setIsRefreshing(false);
       }
     }
     fetchImage();
-  }, [imageId, isPending]);
+  }, [imageId, isPending, isRefreshing]);
 
   const handleAddTag = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +115,8 @@ function AnnotateImagePageContent() {
         });
         setTagInput("");
         toast.success("Tag added!");
+
+        setIsRefreshing(true);
       } else {
         toast.error("Could not add tag");
       }
