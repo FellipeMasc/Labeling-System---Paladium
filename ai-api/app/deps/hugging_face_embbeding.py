@@ -1,3 +1,5 @@
+#explanation -> we could use hugging face embeddings instead of openai embeddings, but we need to install the hugging face library and the model sentence-transformers/all-MiniLM-L6-v2, what would lead us to a bigger docker image and a slower startup time at google cloud run serverless
+
 from typing import List
 # from langchain_huggingface import HuggingFaceEmbeddings
 from app.deps.inference_agent import inference_agent

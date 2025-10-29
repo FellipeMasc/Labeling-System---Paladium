@@ -6,7 +6,7 @@ client = openai.OpenAI()
 
 class inference_agent:
     _instance = None
-
+    # singleton pattern
     def __new__(cls, model: str = "gpt-4.1-mini"):
         if cls._instance is None:
             cls._instance = super(inference_agent, cls).__new__(cls)

@@ -11,7 +11,7 @@ router = APIRouter(tags=["admins"])
 
 @router.post("/auto-users-assign")
 async def auto_users_assign(request: AutoUsersAssignRequest, session: dict = Depends(admin_auth_required), db: connection = Depends(get_db_pg)):
-    #this threshold could be calculated based on the number of images in the group and the number of users in the group
+    #this threshold could be calculated based on the number of images in the group and the number of users in the group, i.e could scale based on the workload
     threshold = 1
     try:
         with db() as conn:
