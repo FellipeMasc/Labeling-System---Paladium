@@ -8,18 +8,25 @@ services:
       - 8080:8080
     env_file:
       - ./ai-api/.env
-    volumes:
-      - ./ai-api:/app
-
+    # volumes:
+    #   - ./ai-api:/app
+    depends_on:
+      - postgres
   front:
+    entrypoint: ["/app/entrypoint.sh"]
     build:
       dockerfile: front/Dockerfile
+      args:
+        - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+        - AI_API_URL=http://ai-api:8080
     ports:
       - 3000:3000
     env_file:
       - ./front/.env
-    volumes:
-      - ./front:/app
+    # volumes:
+    #   - ./front:/app
+    depends_on:
+      - ai-api
 
   postgres:
     image: postgres:15

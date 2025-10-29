@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const awsRegion = process.env.AWS_REGION || "";
 const awsBucketName = process.env.AWS_BUCKET_NAME || "";
-const databaseUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres";
-const aiApiUrl = process.env.AI_API_URL || "http://localhost:8080";
+const databaseUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@postgres:5432/postgres";
+const aiApiUrl = process.env.AI_API_URL || "http://ai-api:8080";
 
 const nextConfig: NextConfig = {
   /* config options here */
